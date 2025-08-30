@@ -8,140 +8,160 @@ public class Time
     private int _minute;
     private int _second;
 
-    // Constructor de la clase Time
+    // 1) Constructor sin parámetros
     public Time()
     {
-        Hour = 00;
-        Millisecond = 000;
-        Minute = 00;
-        Second = 00;
+        Hour = 0;
+        Minute = 0;
+        Second = 0;
+        Millisecond = 0;
     }
 
-    public Time (int Hour)
+    // 2) Constructor con horas
+    public Time(int hour)
     {
-        Hour = _hour;   
+        Hour = hour;
+        Minute = 0;
+        Second = 0;
+        Millisecond = 0;
     }
 
-    public Time (int Hour, int Millisecond)
+    // 3) Constructor con horas y minutos
+    public Time(int hour, int minute)
     {
-        Hour = _hour;
-        Millisecond = _millisecond;
+        Hour = hour;
+        Minute = minute;
+        Second = 0;
+        Millisecond = 0;
     }
 
-    public Time(int Hour, int Millisecond, int Minute)
+    // 4) Constructor con horas, minutos y segundos
+    public Time(int hour, int minute, int second)
     {
-        Hour = _hour;
-        Millisecond = _millisecond;
-        Minute = _minute;
+        Hour = hour;
+        Minute = minute;
+        Second = second;
+        Millisecond = 0;
     }
 
-    public Time(int Hour, int Millisecond, int Minute, int Second)
+    // 5) Constructor con horas, minutos, segundos y milisegundos
+    public Time(int hour, int minute, int second, int millisecond)
     {
-        Hour = _hour;
-        Millisecond = _millisecond;
-        Minute = _minute;
-        Second = _second;
+        Hour = hour;
+        Minute = minute;
+        Second = second;
+        Millisecond = millisecond;
     }
 
     // 3. Metodos // return -> que me devuelva o que me sobreescriba por medio de ToString
+    public Time Add(Time other)
+    {
+        int totalMilli = _millisecond + other._millisecond;
+        int carrySeconds = totalMilli / 1000;
+        int newMillisecond = totalMilli % 1000;
+
+        int totalSec = _second + other._second + carrySeconds;
+        int carryMinutes = totalSec / 60;
+        int newSecond = totalSec % 60;
+
+        int totalMin = _minute + other._minute + carryMinutes;
+        int carryHours = totalMin / 60;
+        int newMinute = totalMin % 60;
+
+        int totalHour = _hour + other._hour + carryHours;
+        int newHour = totalHour % 24;
+
+        return new Time(newHour, newMinute, newSecond, newMillisecond);
+    }
+
     public int Hour
     {
         get => _hour;
-        set
-        { 
-            _hour = ValidateHour(value); 
-        }
+        set => _hour = ValidateHour(value);
     }
-    public int Millisecond
-    {
-        get => _millisecond;
-        set
-        {
-            _millisecond = ValidateMillisecond(value);
-        }
-    }
+
     public int Minute
     {
         get => _minute;
-        set
-        {
-            _minute = ValidateMinute(value);
-        }
+        set => _minute = ValidateMinute(value);
     }
+
     public int Second
     {
         get => _second;
-        set
-        {
-            _second = ValidateSecond(value);
-        }
+        set => _second = ValidateSecond(value);
+    }
+
+    public int Millisecond
+    {
+        get => _millisecond;
+        set => _millisecond = ValidateMillisecond(value);
     }
     public override string ToString()
     {
-        return $"{_hour : 00}/{_minute: 00}/{_second: 00}/{_millisecond: 00}";
+        int hour12 = _hour % 12;
+        if (hour12 == 0) hour12 = 12;
+
+        string amPm = _hour < 12 ? "AM" : "PM"; // Operador ternario para determinar AM o PM
+
+        return $"{hour12:00}:{_minute:00}:{_second:00}.{_millisecond:000} {amPm}";
     }
 
-    // Creacion de To String
-    public int ToHour()
-    {
-        return _hour * 3600000 + _minute * 60000 + _second * 1000 + _millisecond; 
-    }
-    public int ToMillisecond()
+    // Métodos públicos
+    public int ToMilliseconds()
     {
         return _hour * 3600000 + _minute * 60000 + _second * 1000 + _millisecond;
     }
-    public int ToMinute()
+
+    public int ToSeconds()
     {
-        return _hour * 3600000 + _minute * 60000 + _second * 1000 + _millisecond;
+        return _hour * 3600 + _minute * 60 + _second;
     }
-    public int ToSecond()
+
+    public int ToMinutes()
     {
-        return _hour * 3600000 + _minute * 60000 + _second * 1000 + _millisecond;
+        return _hour * 60 + _minute;
+    }
+
+    public bool IsOtherday(Time other)
+    {
+        return this.ToMilliseconds() + other.ToMilliseconds() >= 86400000;
     }
 
     // Los metodos privados van despues de los metodos public o publicos
-    private bool IsOtherday(Time t4)
-    {
-        // Un día son 86,400,000 milisegundos
-        return (this.ToMillisecond() + t4.ToMillisecond()) >= 86400000;
-    }
+    // Validaciones privadas
     private int ValidateHour(int hour)
     {
-        if (hour < 0)
+        if (hour < 0 || hour > 23)
         {
-            throw new Exception("Hour cannot be less than 0");
+            throw new Exception($"The hour: {hour} is not valid");
         }
         return hour;
     }
-    private int ValidateMillisecond(int millisecond)
-    {
-        if (millisecond < 0 && millisecond > 999)
-        {
-            throw new Exception("Hour cannot be less than 0");
-        }
-        return millisecond;
-    }
-
     private int ValidateMinute(int minute)
     {
-        if (minute < 0 && minute > 59)
+        if (minute < 0 || minute > 59)
         {
-            throw new Exception("Hour cannot be less than 0");
+            throw new Exception($"The minute {minute} is not valid");
         }
         return minute;
     }
 
     private int ValidateSecond(int second)
     {
-        if (second < 0 && second > 59)
+        if (second < 0 || second > 59)
         {
-            throw new Exception("Hour cannot be less than 0");
+            throw new Exception($"The second {second} is not valid");
         }
+        return second;
+    }
 
     private int ValidateMillisecond(int millisecond)
     {
         if (millisecond < 0 || millisecond > 999)
-            throw new Exception($"Millisecond {millisecond} must be between 0 and 999");
+        {
+            throw new Exception($"The millisecond {millisecond} is not valid");
+        }
         return millisecond;
     }
 }

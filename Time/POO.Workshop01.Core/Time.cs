@@ -137,6 +137,11 @@ public class Time
         {
             throw new Exception("Hour cannot be less than 0");
         }
-        return second;
+
+    private int ValidateMillisecond(int millisecond)
+    {
+        if (millisecond < 0 || millisecond > 999)
+            throw new Exception($"Millisecond {millisecond} must be between 0 and 999");
+        return millisecond;
     }
 }
